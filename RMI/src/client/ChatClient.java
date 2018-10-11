@@ -112,6 +112,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	            BufferedReader is, server;
 	            PrintStream os;
 
+
 	            Socket clientSocket = new Socket("localhost", clienttarget.getPort());
 	            m = client.getUserName() + " on " + "[" + client.getHost() + ":"  + client.getPort() + "]" + " says: " + m;
 	            InputStream messagestream = new ByteArrayInputStream(m.getBytes());
@@ -122,7 +123,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	            while(true) {
 	                line = is.readLine();
 	                if(line == null) {
-	                	//clientSocket.close();
+	                	clientSocket.close();
 	                    break;
 	                } else if(line.equals("EXIT")) {
 	                    clientSocket.close();

@@ -99,6 +99,7 @@ public class ComputePi implements Runnable {
 	        	if (x == 4) {
 	        		scanner.close();
 	        		System.out.println("Terminating Application...\nPlease do not panic...\nApplication Successfully Terminated!\n");
+	        		System.exit(port);
 	        	}
 	        } catch (Exception e) {
 	            System.err.println("ComputePi exception: " + 
