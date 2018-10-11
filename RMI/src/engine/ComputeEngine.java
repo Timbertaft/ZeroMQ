@@ -7,6 +7,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.*;
 import compute.*;
 
+
 public class ComputeEngine extends UnicastRemoteObject
                            implements Compute
 {
@@ -26,9 +27,12 @@ public class ComputeEngine extends UnicastRemoteObject
     }
 
     public static void main(String[] args) {
+    	
+        
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
+        
         
         // the original example had "//host/Compute" here, which
         // has to be replaced with a real host name. 
@@ -47,5 +51,7 @@ public class ComputeEngine extends UnicastRemoteObject
 			       e.getMessage());
             e.printStackTrace();
         }
+        
+        
     }
 }

@@ -5,7 +5,11 @@ import java.math.*;
 
 public class Pi implements Task {
 
-    /** constants used in pi computation */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7251370472073236058L;
+	/** constants used in pi computation */
     private static final BigDecimal ZERO = 
         BigDecimal.valueOf(0);
     private static final BigDecimal  ONE = 
