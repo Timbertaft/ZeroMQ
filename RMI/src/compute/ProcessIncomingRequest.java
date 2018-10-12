@@ -33,7 +33,6 @@ public class ProcessIncomingRequest implements Runnable {
                 os.println(line);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

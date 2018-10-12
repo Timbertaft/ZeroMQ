@@ -18,7 +18,7 @@ import compute.*;
 public class ChatClient extends UnicastRemoteObject implements Runnable{
 	
 	/**
-	 * 
+	 * The below class handles all client side interaction once within the Chat Client of ComputePi.
 	 */
 	private static final long serialVersionUID = 7925812905228927260L;
 	 private static PresenceService server;
@@ -26,7 +26,6 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	 static boolean chkExit = true;
 	 boolean chkLog = true;
 	 static boolean chkExit2 = true;
-	 //private static Thread thread = new Thread();
 
 	 
 
@@ -35,7 +34,6 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	  ChatClient.server = chatinterface;
 	  ChatClient.ClientName = clientinfo;
 	  chkLog = server.register(clientinfo);
-	  System.out.println(chkLog);
 	 }
 
 	 
@@ -50,20 +48,27 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	@Override
 	public void run() {
 			  if(chkLog)
+				  //Starts by validating that the user is successfully registered with the Presence Service.
 			  {
 				  
 				  Scanner scanner = new Scanner(System.in);
 				  String message;
 			   System.out.println("Successfully Connected to the Chat Server!");
 			   try {
-				   //PresenceService client = new ChatClient(ChatClient.server, ChatClient.ClientName);
-				   //LocateRegistry.createRegistry(registernumber);
-		            //Naming.rebind(name, client);
 		            InetAddress ip = InetAddress.getLocalHost();
 		            System.out.println("ChatClient bound:\nport: " + ClientName.getPort() + "\nIP: " + ip);
+		            
+		            // Below sets default initial state of user to Active to be able to accept chat messages.
+		           
 		            ClientName.setStatus(true);
 		            server.updateRegistrationInfo(ClientName);
+		            
+		            // Below instantiates a Server Socket on the client on a different thread to listen for
+		            // client socket requests. (receive messages)
+		            
 		            SocketServer socket = new SocketServer(ChatClient.ClientName);
+		            
+		            // Below insures proper reset of ChkExit value for re-entry into the ChatMenu.
 		            chkExit = true;
 		            new Thread(socket).start();
 		            
@@ -80,11 +85,18 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			   {
 		        ChatMenu(scanner);
 		        System.out.println("Hit Enter to return to Menu or type EXIT to leave the Chat Server.");
+		        
+		        //Below listens to the scanner to receive user entry and processes based on 
+		        //chosen menu option.
+		        
 			    message = scanner.nextLine();
+			    
+			    // Below processes exit reqeuest.  Unregisters client and sets booleans to exit chat client section
+			    // of ComputePi.  Re-enters the ComputePi original menu upon completion.
+			 
 			    if(message.contains("EXIT") || chkExit2 == false)
 			    {
 			     chkExit = false;
-			     ClientName.setStatus(false);
 			     chkExit2 = true;
 			     try {
 					server.unregister(ChatClient.ClientName.getUserName());
@@ -98,13 +110,18 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			    }
 			   }  
 			  }
+			  
+			  // Below is the response if registration fails.  Will always be triggered
+			  // by finding duplicate names registered.
+			  
 			  else if(!chkLog){
 				  System.out.println("Sorry, this username is already taken.");
 				  ComputePi.Loop();
 			  }
 	}
-		// TODO Auto-generated method stub
 	
+	// Below enters EchoClient method.  Creates a new socket using client's information to send
+	// scanned message from client to serversocket thread on destination client system.
 	
 	public static void EchoClient(RegistrationInfo client, RegistrationInfo clienttarget, String m) {
 		 try {
@@ -122,6 +139,10 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 
 	            while(true) {
 	                line = is.readLine();
+	                
+	                //Below checks if input has been completely processed or if inputted scanner value was
+	                // EXIT.  This is included in order to safeguard proper socket termination.
+	                
 	                if(line == null) {
 	                	clientSocket.close();
 	                    break;
@@ -142,6 +163,9 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	        }
 }
 
+	//Below is the main Chat dialogue tree.  Provides instructions to the user on what each command does,
+	// An invalid command will prompt if user wants to exit.  All other commands are handled within.
+	
 	public static void ChatMenu(Scanner s) {
 		System.out.println("Awaiting input.\n Please enter one of the following commands:\n FRIENDS -"
 				+ " shows a list of all registered users.\n TALK <username> <message> - "
@@ -163,6 +187,10 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 				
 			}
 		}
+		
+		//Below triggers handling of message submission attempt using TALK command. If message and user
+		// are valid, begins creation of ClietnSocket to communicate to peer's socket server.
+		
 		if (message.contains("TALK")) {
 			message = message.replace("TALK" + " ", "");
 			try {
@@ -188,6 +216,9 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			}
 		}
 			
+		//Below is similar to TALK but submits the message with the exclusion of the current user
+		// by looping through the Vector of registered users on the PresenceServer.
+		
 		if (message.contains("BROADCAST")) {
 			message = message.replace("BROADCAST" + " ", "");
 			try {
@@ -203,6 +234,8 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 				e.printStackTrace();
 			}
 		}
+		
+		//Changes users status to Available or changes nothing if user is already available.
 		
 		if (message.contains("AVAILABLE")) {
 			try {
@@ -220,6 +253,8 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			}
 		}
 		
+		//Changes user's status to Busy preventing chat requests or does nothing if user is already available.
+		
 		if (message.contains("BUSY")) {
 			try {
 				if(ClientName.getStatus()) {
@@ -234,6 +269,8 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 				e.printStackTrace();
 			}
 		}
+		
+		//Unregisters the client and flags boolean for final exit call back to Computepi.
 		
 		if (message.contains("EXIT")) {
 			try {

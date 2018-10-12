@@ -22,6 +22,7 @@ public class ComputePi implements Runnable {
     static Random rand = new Random();
 	public static int port = rand.nextInt(9999) + 1000;
 	
+	// Begins by spinning self on a new thread.  This allows multiple clients to be generatable.
 	public static void main(String args[]) {
 		start.start();
 	}
@@ -37,10 +38,21 @@ public class ComputePi implements Runnable {
         Loop();
     }
 	
+	// Loop method is the primary body of the class.  Recalled from ChatClient when ChatClient exits.
+	
 	public static void Loop() {
+		
+		//Ports are generated with a random value to prevent clients from conflicting with one another
+		// when attempting socketing.  There is a check in the boolean method "available" to validate
+		// that the random port assignments are not overlapping.
+		
     	port = rand.nextInt(9999) + 1000;
 		while(x != 4) {
-	        //Start of Primary Try-Catch Block for Pi function.
+			
+	        //Start of Primary Try-Catch Block for Pi function.  Each selection binds a different 
+			// task class to a Computation interface using RMI allowing each to instantiate
+			// new threads as needed.
+			
 	        try {
 	        	if (x == 0) {
 	        	
@@ -111,7 +123,9 @@ public class ComputePi implements Runnable {
     
     
     private static int MainMenu(boolean a, int i, Scanner s) {
+    	
    	 //Beginning of user prompt responses to menu of questions.
+    	
       	while(!a) {
       	System.out.println("Which task would you like performed?"
       			+ "\nPlease enter a corresponding number:"
@@ -119,21 +133,27 @@ public class ComputePi implements Runnable {
       			+ "\n2: Compute Primes"
       			+ "\n3: Chat Client"
       			+ "\n4: Exit");
+      	
       	// Try-Catch Block for catching invalid user entries for main menu.
+      	
       	try {
       	int selection = s.nextInt();
       	i = selection;
       	if(i <= 4) {
       		a = true;
       	}
+      	
       	// Above returns true if range of values are acceptable.  Terminates loop. 
       	//Below catches error if value above option 3.
+      	
       	else {
       		System.out.println("Invalid option.  Please try again.\n");
       		i = 0;
       		s.nextLine();
       	}
+      	
       	// Below catches error if value is not an integer.
+      	
       	}
       	catch(java.util.InputMismatchException e) {
       		System.out.println("Invalid option.  Please try again.\n");
@@ -156,8 +176,10 @@ public class ComputePi implements Runnable {
             	int selection = s.nextInt();
             	i = selection;
             	a = true;
+            	
             	// Below catches error if value is not an integer.
-            	}
+            	
+        	}
             	catch(java.util.InputMismatchException e) {
             		System.out.println("Invalid option.  Please try again.\n");
             		a = false;
@@ -173,7 +195,9 @@ public class ComputePi implements Runnable {
     	System.out.println("\nYou have chosen option " + i + "\n");
     	i = 0;
     	ArrayList<Integer> minmax = new ArrayList<Integer>();
+    	
     	//iterator value "rep" used to assess if previous entry was invalid.  Prevents hanging from lack of user input.
+    	
     	if(rep <= 1) {
     	s.nextLine();
     	}
@@ -194,7 +218,9 @@ public class ComputePi implements Runnable {
             		a = true;
             		s.nextLine();
             	}
+            	
             	// Below catches error if value is not an integer.
+            	
             	}
             	catch(java.util.InputMismatchException e) {
             		System.out.println("Invalid option.  Please try again.\n");
@@ -238,6 +264,7 @@ public class ComputePi implements Runnable {
 
             // If the code makes it this far without an exception it means
             // something is using the port and has responded.
+            
             System.out.println("--------------Port " + port + " is not available");
             return false;
         } catch (IOException e) {

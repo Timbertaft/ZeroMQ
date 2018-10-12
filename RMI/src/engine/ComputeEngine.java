@@ -14,7 +14,7 @@ public class ComputeEngine extends UnicastRemoteObject
 
 
 	/**
-	 * 
+	 * This class handles the binding of the shared Compute interface to the ComputeEngine server object.
 	 */
 	private static final long serialVersionUID = -6020339579736078592L;
 
@@ -36,13 +36,18 @@ public class ComputeEngine extends UnicastRemoteObject
         
         // the original example had "//host/Compute" here, which
         // has to be replaced with a real host name. 
+        
         String name = "//localhost/Compute";
         try {
             Compute engine = new ComputeEngine();
+            
         // Below creates an accessible registry to bind the remote objects to.  MANDATORY to work correctly.
+            
             LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
             Naming.rebind(name, engine);
+            
        // Below pulls IP information to help with troubleshooting as part of the binding process.
+            
             InetAddress ip = InetAddress.getLocalHost();
             System.out.println("ComputeEngine bound:\nport: " + Registry.REGISTRY_PORT + "\nIP: " + ip);
             

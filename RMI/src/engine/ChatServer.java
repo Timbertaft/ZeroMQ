@@ -8,10 +8,12 @@ import java.util.Vector;
 
 import compute.*;
 
-public class ChatServer extends UnicastRemoteObject implements PresenceService, Runnable {
+public class ChatServer extends UnicastRemoteObject implements PresenceService {
 	
 	/**
-	 * 
+	 * This class handles communication with the Presence Service.  All clients use this
+	 * class in order to reference the stored Vector and makes changes/references to their/other clients'
+	 * registration info.
 	 */
 	private static final long serialVersionUID = -5493056279692685386L;
 	private Vector<RegistrationInfo> chatClients = new Vector<RegistrationInfo>();
@@ -19,12 +21,9 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 	protected ChatServer() throws RemoteException {
 	}
 	
-	@Override
-	public void run() {
-		
-	}
+	//Handles registration of Client by inputting passed Client registration info into the
+	// list of registered users stored server vector.
 	
-	@Override
 	public synchronized boolean register(RegistrationInfo reg) throws RemoteException {
 		boolean y = true;
 		if (chatClients != null && chatClients.size() > 0) {
@@ -47,6 +46,9 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 	}
 
 	@Override
+	
+	//Below allows clients to change their availability from available to busy and vise versa.
+	
 	public synchronized boolean updateRegistrationInfo(RegistrationInfo reg) throws RemoteException {
 		for(RegistrationInfo e : chatClients) {
 			if(e.getUserName().equals(reg.getUserName())) {
@@ -61,6 +63,8 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 		}
 		return false;
 	}
+	
+	//Removes client from list of registerd users stored vector upon client termination.
 
 	@Override
 	public synchronized void unregister(String userName) throws RemoteException {
@@ -71,6 +75,8 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 		}
 		
 	}
+	
+	//Allows clients to search for registration info of other registered users in the system.
 
 	@Override
 	public synchronized RegistrationInfo lookup(String name) throws RemoteException {
@@ -81,6 +87,8 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 		}	
 		return null;
 	}
+	
+	//Below is the vector storing the registration info of users locally on the server.
 
 	@Override
 	public synchronized Vector<RegistrationInfo> listRegisteredUsers() throws RemoteException {
@@ -89,6 +97,9 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
 
 
 	public static void main(String[] args) {
+		
+		//Below creates the server as a bound RMI object that interacts with the shared PresenceService
+		//interface.  
         
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
@@ -97,11 +108,15 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService, 
         
         try {
             PresenceService serve = new ChatServer();
+            
         // Below creates an accessible registry to bind the remote objects to.  MANDATORY to work correctly.
+            
             LocateRegistry.createRegistry(9800);
             String name = "//localhost/ChatServer";
             Naming.rebind(name, serve);
+            
        // Below pulls IP information to help with troubleshooting as part of the binding process.
+            
             InetAddress ip = InetAddress.getByName("localhost");
             System.out.println("ChatServer bound:\nport: " + "9800" + "\nIP: " + ip);
             

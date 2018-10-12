@@ -18,7 +18,9 @@ public class SocketServer implements Runnable {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		// This class instantiates a listening server socket on the calling client to receive incoming
+		// messages that get passed.
+		
 		try {
 	        ServerSocket chatServer = new ServerSocket(SocketServer.connection.getPort());
 	        running = true;
@@ -29,8 +31,8 @@ public class SocketServer implements Runnable {
 	        		Thread thread  = new Thread(new ProcessIncomingRequest(clientSocket));
 	        		thread.start();
 	        		
-        			//The below block is to correct memory leak.
-	        		if(ChatClient.GetChk() == true) {
+        			//The below block is to correct a memory leak and properly close the socket on exit.
+	        		if(ChatClient.GetChk() == false) {
 	        			running = false;
 	        			
 
@@ -42,15 +44,13 @@ public class SocketServer implements Runnable {
 	        				
 	        			}
 	        		}
-	        		// The above block is to correct memory leak.  Causing issues.
+	        		// The above block is to correct a memory leak and properly close the socket on exit.
 	        	} 
 	        	catch (IOException e) {
-	            // TODO Auto-generated catch block
 	        		e.printStackTrace();
 	        	}
 	    	}
 	    } catch (IOException e) {
-	        // TODO Auto-generated catch block
 	        e.printStackTrace();
 	        return;
 	    }
