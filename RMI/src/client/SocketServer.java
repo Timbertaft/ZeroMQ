@@ -11,7 +11,7 @@ public class SocketServer implements Runnable {
 	private static RegistrationInfo connection;
 	private static boolean running;
 	
-	protected SocketServer(RegistrationInfo userconnect) {
+	SocketServer(RegistrationInfo userconnect) {
 		
 		SocketServer.connection = userconnect;
 	}
@@ -32,7 +32,7 @@ public class SocketServer implements Runnable {
 	        		thread.start();
 	        		
         			//The below block is to correct a memory leak and properly close the socket on exit.
-	        		if(ChatClient.GetChk() == false) {
+	        		if(!ChatClient.GetChk()) {
 	        			running = false;
 	        			
 

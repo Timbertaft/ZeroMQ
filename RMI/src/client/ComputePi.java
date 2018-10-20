@@ -15,13 +15,13 @@ import compute.*;
 public class ComputePi implements Runnable {
 	
 	private static Thread start = new Thread(new ComputePi());
-	static int x = 0;
-    static int iterator = 0;
-    final static Scanner scanner = new Scanner(System.in);
-    static boolean validOption = false;
-    static Random rand = new Random();
-	public static int port = rand.nextInt(9999) + 1000;
-	
+	private static int x = 0;
+    private static int iterator = 0;
+    private final static Scanner scanner = new Scanner(System.in);
+    private static boolean validOption = false;
+    private static Random rand = new Random();
+	private static int port = rand.nextInt(9999) + 1000;
+
 	// Begins by spinning self on a new thread.  This allows multiple clients to be generatable.
 	public static void main(String args[]) {
 		start.start();
@@ -40,12 +40,12 @@ public class ComputePi implements Runnable {
 	
 	// Loop method is the primary body of the class.  Recalled from ChatClient when ChatClient exits.
 	
-	public static void Loop() {
+	static void Loop() {
 		
 		//Ports are generated with a random value to prevent clients from conflicting with one another
 		// when attempting socketing.  There is a check in the boolean method "available" to validate
 		// that the random port assignments are not overlapping.
-		
+
     	port = rand.nextInt(9999) + 1000;
 		while(x != 4) {
 			
@@ -60,7 +60,7 @@ public class ComputePi implements Runnable {
 	        	}
 	        	
 	        	if(x == 1) {
-	        	x = DecimalPick(validOption, x, scanner);
+	        	x = DecimalPick(validOption, x);
 	      	
 	        	String y = Integer.toString(x);
 	            String name = "//" + "localhost" + "/Compute";
@@ -73,7 +73,7 @@ public class ComputePi implements Runnable {
 	        	
 	        	if(x == 2) {
 	        		iterator += 1;
-	        		ArrayList<Integer> y = PrimePick(validOption, x, scanner, iterator);
+	        		ArrayList<Integer> y = PrimePick(validOption, x, iterator);
 	        		String name = "//" + "localhost" + "/Compute";
 	        		Compute comp = (Compute) Naming.lookup(name);
 	        		Primes task = new Primes(y);
@@ -92,7 +92,7 @@ public class ComputePi implements Runnable {
 	        	}
 	        	
 	        	if (x == 3) {
-	        		String y = Username(validOption, x, scanner);
+	        		String y = Username(validOption, x);
 	        		String name = "//" + "localhost" + "/ChatServer";
 	        		boolean loginstatus = false;
 	        		while(!available(port)) {
@@ -137,8 +137,7 @@ public class ComputePi implements Runnable {
       	// Try-Catch Block for catching invalid user entries for main menu.
       	
       	try {
-      	int selection = s.nextInt();
-      	i = selection;
+			i = s.nextInt();
       	if(i <= 4) {
       		a = true;
       	}
@@ -165,16 +164,15 @@ public class ComputePi implements Runnable {
 		return i;
       }
     
-    private static int DecimalPick(boolean a, int i, Scanner s) {
+    private static int DecimalPick(boolean a, int i) {
     	a = false;
-    	s.nextLine();
+    	ComputePi.scanner.nextLine();
     	System.out.println("\nYou have chosen option " + i + "\n");
     	i = 0;
     	while(!a) {    		
         	System.out.println("COMPUTE PI:\n To how many decimal places do you want Pi computed?");
         	try {
-            	int selection = s.nextInt();
-            	i = selection;
+				i = ComputePi.scanner.nextInt();
             	a = true;
             	
             	// Below catches error if value is not an integer.
@@ -184,13 +182,13 @@ public class ComputePi implements Runnable {
             		System.out.println("Invalid option.  Please try again.\n");
             		a = false;
             		i = 0;
-            		s.nextLine();
+            		ComputePi.scanner.nextLine();
             	}
     	}
     	return i;
     }
     
-    private static ArrayList<Integer> PrimePick(boolean a, int i, Scanner s, int rep) {
+    private static ArrayList<Integer> PrimePick(boolean a, int i, int rep) {
     	a = false;
     	System.out.println("\nYou have chosen option " + i + "\n");
     	i = 0;
@@ -199,7 +197,7 @@ public class ComputePi implements Runnable {
     	//iterator value "rep" used to assess if previous entry was invalid.  Prevents hanging from lack of user input.
     	
     	if(rep <= 1) {
-    	s.nextLine();
+    	ComputePi.scanner.nextLine();
     	}
     	while(!a) {    		
     		if(minmax.isEmpty()) {
@@ -211,12 +209,11 @@ public class ComputePi implements Runnable {
     			System.out.println("\nChoose the lower bound.");
     		}
         	try {
-            	int selection = s.nextInt();
-            	i = selection;
+				i = ComputePi.scanner.nextInt();
             	minmax.add(i);
             	if(minmax.size() >= 2) {
             		a = true;
-            		s.nextLine();
+            		ComputePi.scanner.nextLine();
             	}
             	
             	// Below catches error if value is not an integer.
@@ -226,30 +223,30 @@ public class ComputePi implements Runnable {
             		System.out.println("Invalid option.  Please try again.\n");
             		a = false;
             		i = 0;
-            		s.nextLine();
+            		ComputePi.scanner.nextLine();
             	}
     	}
     	return minmax;
     }
     
-    private static String Username(boolean a, int i, Scanner s) {
+    private static String Username(boolean a, int i) {
     	a = false;
     	System.out.println("\nYou have chosen option " + i + "\n");
     	i = 0;
-    	s.nextLine();
+    	ComputePi.scanner.nextLine();
     	String username = null;
     	while(!a) {
     		System.out.println("CHAT CLIENT:\n Welcome to RMI CHAT!"
     				+ "  Please enter your preferred username.");
     		try {
-    			username = s.nextLine();
+    			username = ComputePi.scanner.nextLine();
     			a = true;
     		}
     		catch (java.util.InputMismatchException e) {
     			System.out.println("Something was wrong with this Username choice.  Please try again.\n");
     			a = false;
     			i = 0;
-    			s.nextLine();
+    			ComputePi.scanner.nextLine();
     		}
     	}
     	return username;

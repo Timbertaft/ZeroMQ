@@ -37,7 +37,8 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 			
 		}
 		}
-		if(y == true) {
+		if(y) {
+			assert this.chatClients != null;
 			System.out.println(this.chatClients.size());
 			this.chatClients.add(reg);		
 		}
@@ -93,6 +94,11 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 	@Override
 	public synchronized Vector<RegistrationInfo> listRegisteredUsers() throws RemoteException {
 		return this.chatClients;
+	}
+
+	@Override
+	public void broadcast(String msg) throws RemoteException {
+		
 	}
 
 

@@ -29,7 +29,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 
 	 
 
-	 protected ChatClient(PresenceService chatinterface, RegistrationInfo clientinfo) throws RemoteException
+	 ChatClient(PresenceService chatinterface, RegistrationInfo clientinfo) throws RemoteException
 	 {
 	  ChatClient.server = chatinterface;
 	  ChatClient.ClientName = clientinfo;
@@ -37,11 +37,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	 }
 
 	 
-	 protected ChatClient() throws RemoteException {
-		 
-	 }
-	 
-	 public static boolean GetChk() {
+	 static boolean GetChk() {
 		return chkExit; 
 	 }
 	 
@@ -94,7 +90,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			    // Below processes exit reqeuest.  Unregisters client and sets booleans to exit chat client section
 			    // of ComputePi.  Re-enters the ComputePi original menu upon completion.
 			 
-			    if(message.contains("EXIT") || chkExit2 == false)
+			    if(message.contains("EXIT") || !chkExit2)
 			    {
 			     chkExit = false;
 			     chkExit2 = true;
@@ -123,7 +119,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	// Below enters EchoClient method.  Creates a new socket using client's information to send
 	// scanned message from client to serversocket thread on destination client system.
 	
-	public static void EchoClient(RegistrationInfo client, RegistrationInfo clienttarget, String m) {
+	private static void EchoClient(RegistrationInfo client, RegistrationInfo clienttarget, String m) {
 		 try {
 	            String line;
 	            BufferedReader is, server;
@@ -154,9 +150,6 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	                line = server.readLine();
 	            }
 
-	        } catch (UnknownHostException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
 	        } catch (IOException e) {
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
@@ -166,7 +159,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	//Below is the main Chat dialogue tree.  Provides instructions to the user on what each command does,
 	// An invalid command will prompt if user wants to exit.  All other commands are handled within.
 	
-	public static void ChatMenu(Scanner s) {
+	private static void ChatMenu(Scanner s) {
 		System.out.println("Awaiting input.\n Please enter one of the following commands:\n FRIENDS -"
 				+ " shows a list of all registered users.\n TALK <username> <message> - "
 				+ " Starts a pirvate message conversation with inputted username if they are available.\n"
@@ -184,7 +177,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 				}
 			}
 			catch(RemoteException e) {
-				
+				e.printStackTrace();
 			}
 		}
 		
@@ -199,17 +192,17 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 					if(e == null) {
 						System.out.println("Specified user does not presently exist in the system.");
 					}		
-					else if(e != null && e.getStatus() && !(ClientName.getUserName()).equals(e.getUserName())) {
+					else if(e.getStatus() && !(ClientName.getUserName()).equals(e.getUserName())) {
 						message = message.replace(e.getUserName() + " ", "");
 						EchoClient(ClientName, e, message);
 						}
-					else if(e != null && !e.getStatus()) {
+					else if(!e.getStatus()) {
 						System.out.println("User " + e.getUserName() + " is currently unavailable.");
 					}
-					else if(ClientName.getUserName().equals(e.getUserName()) && e != null) {
+					else if(ClientName.getUserName().equals(e.getUserName())) {
 						System.out.println("Why would you want to talk to yourself?");
 					}
-					
+
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -221,12 +214,11 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 		
 		if (message.contains("BROADCAST")) {
 			message = message.replace("BROADCAST" + " ", "");
+			String broad = "@everyone: ";
+			message = broad + message;
 			try {
 				for(RegistrationInfo e: server.listRegisteredUsers()) {
 					if(e.getStatus() && !(e.getUserName().equals(ClientName.getUserName()))) {
-					message.replaceFirst(e.getUserName() + " ", "");
-					String broad = "@everyone: ";
-					message = broad + message;
 					EchoClient(ClientName, e, message);
 					}
 				}

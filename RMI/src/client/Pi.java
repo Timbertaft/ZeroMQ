@@ -49,7 +49,7 @@ public class Pi implements Task {
      * and a power series expansion of arctan(x) to 
      * sufficient precision.
      */
-    public static BigDecimal computePi(int digits) {
+    private static BigDecimal computePi(int digits) {
         int scale = digits + 5;
         BigDecimal arctan1_5 = arctan(5, scale);
         BigDecimal arctan1_239 = arctan(239, scale);
@@ -68,8 +68,8 @@ public class Pi implements Task {
      * arctan(x) = x - (x^3)/3 + (x^5)/5 - (x^7)/7 + 
      *     (x^9)/9 ...
      */   
-    public static BigDecimal arctan(int inverseX, 
-                                  int scale) 
+    private static BigDecimal arctan(int inverseX,
+                                     int scale)
     {
         BigDecimal result, numer, term;
         BigDecimal invX = BigDecimal.valueOf(inverseX);

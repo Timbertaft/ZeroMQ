@@ -12,7 +12,7 @@ public class Primes implements Task {
 	private static final long serialVersionUID = -4787698337153180499L;
 	private ArrayList<Integer> range;
 	
-	public Primes(ArrayList<Integer> range) {
+	Primes(ArrayList<Integer> range) {
         this.range = range;
     }
 	@Override
@@ -20,7 +20,7 @@ public class Primes implements Task {
 		return PrimeCalculate(range);
 	}
 	
-	public static Object[] PrimeCalculate(ArrayList<Integer> prime) {
+	private static Object[] PrimeCalculate(ArrayList<Integer> prime) {
 		boolean flag = false;
 		boolean loop = false; 
 		
@@ -58,14 +58,14 @@ public class Primes implements Task {
 						flag = true;
 					}
 				}
-				if(flag == true) {
+				if(flag) {
 					
 					//added prime
 					
 					primelist.add(i);
 				}
 			}
-			if(loop == true) {
+			if(loop) {
 			primearray = primelist.toArray();
 			return primearray;
 		} else {
