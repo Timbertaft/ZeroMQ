@@ -13,7 +13,7 @@ Offers 4 options:
  you can add it to your version of Eclipse by going to http://www.genady.net/rmi/v20/install_e42/ (for Eclipse version 4.x.x))
  
  NOTE: Alternatively, I have modified the code so that it can work without the plugin if VM arguments are inserted.  
- (insert Djava.security.policy=file:C:/Users/mdpoc/IdeaProjects/Computation_Engine/RMI/security.policy/ -Djava.rmi.server.codebase=file:C:/Users/mdpoc/IdeaProjects/Computation_Engine/RMI/bin/ 
+ (insert Djava.security.policy=file:<directory path to project>/Computation_Engine/RMI/security.policy/ -Djava.rmi.server.codebase=file:<directory path to project>/Computation_Engine/RMI/bin/ 
  into the ChatServer, ComputationEngine, and Computepi class VM arguments)
  
  Once installed, just run the ComputationEngine as an RMI object (or just run it as normal if VM arguments are used), run the ChatServer in the same way, and then run ComputePi.  Be sure to include "localhost" in the command line arguments as well.
