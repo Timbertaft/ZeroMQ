@@ -12,11 +12,14 @@ Offers 4 options:
  (This requirement is due to having used the plugin to permit configuration of the simulation.  If you do not have the pluin,
  you can add it to your version of Eclipse by going to http://www.genady.net/rmi/v20/install_e42/ (for Eclipse version 4.x.x))
  
- Once installed, just run the Compute Engine as an RMI object and then run the PI Computation Client configuration.
- (if this configuration is missing, run a new RMI configuration with the project name RMI and set command line arguements to "localhost 100" )
- This will set two command line values, one for the initial start of the server to reference the localhost IP and one for an initial value
- to compute Pi.  (these command line arguments may be replaced with codified values in the future to remove the possibility for user error.)
+ NOTE: Alternatively, I have modified the code so that it can work without the plugin if VM arguments are inserted.  
+ (insert Djava.security.policy=file:C:/Users/mdpoc/IdeaProjects/Computation_Engine/RMI/security.policy/ -Djava.rmi.server.codebase=file:C:/Users/mdpoc/IdeaProjects/Computation_Engine/RMI/bin/ 
+ into the ChatServer, ComputationEngine, and Computepi class VM arguments)
+ 
+ Once installed, just run the ComputationEngine as an RMI object (or just run it as normal if VM arguments are used), run the ChatServer in the same way, and then run ComputePi.  Be sure to include "localhost" in the command line arguments as well.
  
  Thank you for looking at the program.
  
- At the time of writing this Readme, the Chat client is still a WIP.
+This is complete for the basic socketing and RMI requirements of the project.
+
+Next build will be a modified version supporting ZeroMQ functionality.
