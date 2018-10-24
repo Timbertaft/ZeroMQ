@@ -8,10 +8,10 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+import org.zeromq.ZMQ;
 
 import compute.*;
 
@@ -62,11 +62,16 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 		            // Below instantiates a Server Socket on the client on a different thread to listen for
 		            // client socket requests. (receive messages)
 		            
-		            SocketServer socket = new SocketServer(ChatClient.ClientName);
+		            //SocketServer socket = new SocketServer(ChatClient.ClientName);
+		            SocketServerZMQ MQsocket = new SocketServerZMQ(ChatClient.ClientName);
+                   ZMQPubSocket PubSocket = new ZMQPubSocket(ChatClient.ClientName);
+                   new Thread(PubSocket).start();
+
 		            
 		            // Below insures proper reset of ChkExit value for re-entry into the ChatMenu.
 		            chkExit = true;
-		            new Thread(socket).start();
+		            //new Thread(socket).start();
+		            new Thread(MQsocket).start();
 		            
 			   }
 			   catch(Exception e) {
@@ -120,41 +125,51 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 	// scanned message from client to serversocket thread on destination client system.
 	
 	private static void EchoClient(RegistrationInfo client, RegistrationInfo clienttarget, String m) {
-		 try {
-	            String line;
-	            BufferedReader is, server;
-	            PrintStream os;
+        String line;
+        BufferedReader is, server;
+        PrintStream os;
+        ZMQ.Context context = ZMQ.context(1);
+        System.out.println("Connecting to ZMQServer...");
 
+        ZMQ.Socket requester = context.socket(ZMQ.REQ);
+        requester.connect("tcp://localhost:" + clienttarget.getPort());
+        //Socket clientSocket = new Socket("localhost", clienttarget.getPort());
+        m = client.getUserName() + " on " + "[" + client.getHost() + ":"  + client.getPort() + "]" + " says: " + m;
 
-	            Socket clientSocket = new Socket("localhost", clienttarget.getPort());
-	            m = client.getUserName() + " on " + "[" + client.getHost() + ":"  + client.getPort() + "]" + " says: " + m;
-	            InputStream messagestream = new ByteArrayInputStream(m.getBytes());
-	            is = new BufferedReader(new InputStreamReader(messagestream) );
-	            os = new PrintStream(clientSocket.getOutputStream());
-	            server = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+       // for (int requestNbr = 0; requestNbr != 10; requestNbr++) {
+            String request = m;
+            System.out.println("Sending message...");
+            requester.send(request.getBytes(), 0);
 
-	            while(true) {
-	                line = is.readLine();
-	                
-	                //Below checks if input has been completely processed or if inputted scanner value was
-	                // EXIT.  This is included in order to safeguard proper socket termination.
-	                
-	                if(line == null) {
-	                	clientSocket.close();
-	                    break;
-	                } else if(line.equals("EXIT")) {
-	                    clientSocket.close();
-	                    break;
-	                }
-	                os.println(line);
-	                line = server.readLine();
-	            }
+            //byte[] reply = requester.recv(0);
+            //System.out.println("Received " + new String(reply) + " " + requestNbr);
+       // }
+        requester.close();
+        context.term();
 
-	        } catch (IOException e) {
-	            // TODO Auto-generated catch block
-	            e.printStackTrace();
-	        }
-}
+        //InputStream messagestream = new ByteArrayInputStream(m.getBytes());
+        //is = new BufferedReader(new InputStreamReader(messagestream) );
+        //os = new PrintStream(clientSocket.getOutputStream());
+        //server = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+        //while(true) {
+        //line = is.readLine();
+
+        //Below checks if input has been completely processed or if inputted scanner value was
+        // EXIT.  This is included in order to safeguard proper socket termination.
+
+        // if(line == null) {
+        //clientSocket.close();
+        //    break;
+        // } else if(line.equals("EXIT")) {
+        //clientSocket.close();
+        //   break;
+        // }
+        //  os.println(line);
+        //   line = server.readLine();
+        //  }
+
+    }
 
 	//Below is the main Chat dialogue tree.  Provides instructions to the user on what each command does,
 	// An invalid command will prompt if user wants to exit.  All other commands are handled within.
@@ -167,8 +182,8 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 				+ " Sets users current status to show as unavailable.\n AVAILABLE -"
 				+ " Sets users current status to show as available.\n EXIT -"
 				+ " Unregisters username and terminates chat application.");
-		
-		String message = s.nextLine();
+
+        String message = s.nextLine();
 		if (message.contains("FRIENDS")) {
 			try {
 				for(RegistrationInfo e: server.listRegisteredUsers()) {
@@ -216,12 +231,17 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 			message = message.replace("BROADCAST" + " ", "");
 			String broad = "@everyone: ";
 			message = broad + message;
+            message = ClientName.getUserName() + " on " + "[" + ClientName.getHost() + ":"  + ClientName.getPort() +
+                    "]" + " says: " + message;
+
 			try {
-				for(RegistrationInfo e: server.listRegisteredUsers()) {
-					if(e.getStatus() && !(e.getUserName().equals(ClientName.getUserName()))) {
-					EchoClient(ClientName, e, message);
-					}
-				}
+				//for(RegistrationInfo e: server.listRegisteredUsers()) {
+					//if(e.getStatus() && !(e.getUserName().equals(ClientName.getUserName()))) {
+					//EchoClient(ClientName, e, message);
+					//}
+                server.broadcast(message);
+                //System.out.println("Message Sent");
+				//}
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}

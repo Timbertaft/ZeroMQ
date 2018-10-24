@@ -5,8 +5,6 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.*;
 import java.util.Vector;
-import org.zeromq.ZMQ;
-import java.util.Random;
 
 import compute.*;
 
@@ -19,6 +17,8 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 	 */
 	private static final long serialVersionUID = -5493056279692685386L;
 	private Vector<RegistrationInfo> chatClients = new Vector<RegistrationInfo>();
+	private static Thread t;
+	private static ZMQBroadSocket broadcaster = new ZMQBroadSocket();
 	
 	protected ChatServer() throws RemoteException {
         super();
@@ -102,7 +102,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 
 	@Override
 	public void broadcast(String msg) throws RemoteException {
-
+	    broadcaster.SetMessage(msg);
 	}
 
 
@@ -128,6 +128,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
             
             InetAddress ip = InetAddress.getByName("localhost");
             System.out.println("ChatServer bound:\nport: " + "9800" + "\nIP: " + ip);
+            broadcaster.initialize();
             Object m = new Object();
 			synchronized (m) {
 				m.wait();
