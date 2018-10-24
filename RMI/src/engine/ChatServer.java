@@ -5,6 +5,8 @@ import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.*;
 import java.util.Vector;
+import org.zeromq.ZMQ;
+import java.util.Random;
 
 import compute.*;
 
@@ -19,6 +21,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 	private Vector<RegistrationInfo> chatClients = new Vector<RegistrationInfo>();
 	
 	protected ChatServer() throws RemoteException {
+        super();
 	}
 	
 	//Handles registration of Client by inputting passed Client registration info into the
@@ -33,6 +36,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 			if(e.getUserName().equals(reg.getUserName())) {
 				System.out.println("flag set to false");
 				y = false;
+
 			}
 			
 		}
@@ -98,7 +102,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 
 	@Override
 	public void broadcast(String msg) throws RemoteException {
-		
+
 	}
 
 
@@ -110,22 +114,24 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        
-        
+
+        String name = "//localhost/ChatServer";
         try {
             PresenceService serve = new ChatServer();
             
         // Below creates an accessible registry to bind the remote objects to.  MANDATORY to work correctly.
             
             LocateRegistry.createRegistry(9800);
-            String name = "//localhost/ChatServer";
             Naming.rebind(name, serve);
             
        // Below pulls IP information to help with troubleshooting as part of the binding process.
             
             InetAddress ip = InetAddress.getByName("localhost");
             System.out.println("ChatServer bound:\nport: " + "9800" + "\nIP: " + ip);
-            
+            Object m = new Object();
+			synchronized (m) {
+				m.wait();
+			}
         } catch (Exception e) {
             System.err.println("ChatServer exception: " + 
 			       e.getMessage());
