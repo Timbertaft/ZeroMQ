@@ -22,4 +22,4 @@ Offers 4 options:
  
 This is complete for the basic socketing and RMI requirements of the project.
 
-Next build will be a modified version supporting ZeroMQ functionality.
+This branch handles the messaging and broadcast functions by using ZeroMQ functionality through a Maven build that uses the JeroMQ library.  NOTE: There is presently an issue where the broadcast function only works properly when run in debug mode.  Still investigating the cause of this bug.
