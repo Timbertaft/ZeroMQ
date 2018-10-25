@@ -11,6 +11,7 @@ public class ZMQBroadSocket {
 
     private static String message;
 
+
     void SetMessage(String msg) {
         ZMQBroadSocket.message = msg;
     }
@@ -19,7 +20,7 @@ public class ZMQBroadSocket {
 
     }
 
-    void initialize() {
+    void initialize() throws InterruptedException {
         //  Prepare our context and publisher
         ZMQ.Context context = ZMQ.context(1);
 
@@ -35,6 +36,7 @@ public class ZMQBroadSocket {
                         publisher.send(ZMQBroadSocket.message, 0);
                         ZMQBroadSocket.message = "";
                     }
+                    Thread.sleep(1000);
                 }
         publisher.close ();
         context.term ();

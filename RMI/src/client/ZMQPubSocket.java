@@ -25,7 +25,8 @@ public class ZMQPubSocket implements Runnable {
 
             subscriber.unsubscribe(ZMQPubSocket.connection.getUserName().getBytes());
             String string = subscriber.recvStr(0).trim();
-                if(!string.isEmpty() && !string.contains(ZMQPubSocket.connection.getUserName())) {
+                if(!string.isEmpty() && !string.contains(ZMQPubSocket.connection.getUserName()) &&
+                        ZMQPubSocket.connection.getStatus()) {
                     System.out.println(string);
                 }
 

@@ -65,13 +65,13 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 		            //SocketServer socket = new SocketServer(ChatClient.ClientName);
 		            SocketServerZMQ MQsocket = new SocketServerZMQ(ChatClient.ClientName);
                    ZMQPubSocket PubSocket = new ZMQPubSocket(ChatClient.ClientName);
-                   new Thread(PubSocket).start();
 
 		            
 		            // Below insures proper reset of ChkExit value for re-entry into the ChatMenu.
 		            chkExit = true;
 		            //new Thread(socket).start();
 		            new Thread(MQsocket).start();
+                    new Thread(PubSocket).start();
 		            
 			   }
 			   catch(Exception e) {
@@ -91,7 +91,7 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 		        //chosen menu option.
 		        
 			    message = scanner.nextLine();
-			    
+
 			    // Below processes exit reqeuest.  Unregisters client and sets booleans to exit chat client section
 			    // of ComputePi.  Re-enters the ComputePi original menu upon completion.
 			 
@@ -286,6 +286,8 @@ public class ChatClient extends UnicastRemoteObject implements Runnable{
 		
 		if (message.contains("EXIT")) {
 			try {
+                ClientName.setStatus(false);
+                server.updateRegistrationInfo(ClientName);
 				server.unregister(ClientName.getUserName());
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block

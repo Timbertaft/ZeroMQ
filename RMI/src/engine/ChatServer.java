@@ -101,7 +101,7 @@ public class ChatServer extends UnicastRemoteObject implements PresenceService {
 	}
 
 	@Override
-	public void broadcast(String msg) throws RemoteException {
+	public synchronized void broadcast(String msg) throws RemoteException {
 	    broadcaster.SetMessage(msg);
 	}
 
